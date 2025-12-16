@@ -4,6 +4,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
+#include <algorithm>
 
 struct Node {
     std::vector<int> number_list;
@@ -122,136 +124,6 @@ class BinarySearchTree {
         }
 };
 
-class System {
-    private:
-        std::vector<Statics> main_list;
-        std::size_t size;
-        BinarySearchTree root;
-        int height;
-        bool deletemin;
-    public:
-        System() {
-            size = 0;
-            height = 0;
-            deletemin = true;
-        }
-
-        int binarySearch(int target) {
-            int l = 0, r = main_list.size() - 1;
-
-            while (l <= r) {
-                int mid = l + (r - l) / 2;
-                if (main_list[mid].num == target)
-                    return mid;
-                else if (main_list[mid].num < target)
-                    l = mid + 1;
-                else
-                    r = mid - 1;
-            }
-            return -1;
-        }
-
-        Node* add(int num, int hp, Node *tree) {
-            Node* cur = root.top();
-            if (cur == nullptr) {
-                Node* new_node = new Node;
-                new_node -> hp = hp;
-                new_node -> left = nullptr;
-                new_node -> right = nullptr;
-                new_node -> number_list.push_back(num);
-                cur = new_node;
-                return cur;
-            } else if (cur -> hp < hp) {
-                cur -> left = add(num, hp, cur -> left);
-                return cur;
-            } else if (cur -> hp > hp) {
-                cur -> right = add(num, hp, cur -> right);
-                return cur;
-            } else if (cur -> hp == hp) {
-                cur -> number_list.push_back(num);
-                return cur;
-            }
-            return cur;
-        }
-
-        int findInRange(int lower, int upper, Node *tree, std::vector<int>& list) {
-            Node *cur = tree;
-            std::size_t count = 0;
-            if (lower > cur -> hp)
-                count += findInRange(lower, upper, tree->left, list);
-            if (lower <= cur -> hp && upper >= cur -> hp) {
-                for (auto number : cur -> number_list) {
-                    list.push_back(number);
-                }
-                count += cur -> number_list.size();
-            }
-            if (upper < cur -> hp)
-                count += findInRange(lower, upper, tree->right, list);
-            return count;
-        }
-
-        void Task1() {
-            std::string prefix;
-            std::cin >> prefix;
-            if (!std::ifstream("input" + prefix + ".txt")) {
-                std::cout << "File not found!\n";
-                return;
-            }
-            IO::readFile(prefix, main_list);
-            IO::printTask1(main_list);
-            std::cout << "HP tree height = " << height << std::endl;
-        }
-
-        void Task2(int num1, int num2) {
-            std::vector<int> list;
-            int index;
-            Node* cur = root.top();
-            if (num1 > num2)
-                std::swap(num1, num2);
-            int count_visited = findInRange(num1, num2, cur, list);
-            std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense" << std::endl;
-            for (int i = 0; i < list.size(); i++) {
-                index = binarySearch(list[i]);
-                std::cout << "[ " << i+1 << "]";
-                IO::printTask2(main_list[index]);
-            }
-        }
-
-        void Task3() {
-            int rec_hp;
-            int count = 1;
-            bool found = false;
-            if (deletemin) {
-                rec_hp = root.deleteMin();
-            } else {
-                rec_hp = root.deleteMax();
-            }
-            if (rec_hp != 0) {
-                while (true) {
-                    found = false;
-                    std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\tSp. Atk\tSp. Def" << std::endl;
-                    for (int i = 0; i < main_list.size()-1; i++) {
-                        if (rec_hp == main_list[i].hp) {
-                            std::cout << "[ " << count+1 << "]";
-                            IO::printTask3(main_list[i]);
-                            main_list.erase(main_list.begin()+i);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        break;
-                    }
-                }
-                height = root.height(root.top());
-                std::cout << "HP tree height = " << height << std::endl;
-                deletemin= true;
-            } else {
-                std::cout << "----- Execute Mission 1 first! -----" << std::endl;
-            }
-        }
-};
-
 class IO {
     public:
         static void readFile(const std::string& prefix, std::vector<Statics>& list) {
@@ -264,11 +136,15 @@ class IO {
                 Statics data;
                 std::string num, name, type1, type2, total, hp, atk, def, sp_atk, sp_def, speed, generation, legendary;
                 linestream >> num >> name >> type1 >> type2;
-                if (std::stoi(type2)) { // no type2 value -> total
+                try {
+                    int temp = std::stoi(type2);
+                    // type2 was actually the total
                     total = type2;
-                } else {
+                    type2 = "";
+                } catch (...) {
                     linestream >> total;
                 }
+
                 linestream >> hp >> atk >> def >> sp_atk >> sp_def >> speed >> generation >> legendary;
                 data.num = std::stoi(num);
                 data.name = name;
@@ -288,20 +164,230 @@ class IO {
         }
 
         static void printTask1(const std::vector<Statics>& list) {
-            std::cout << "\t#\tName\tType 1\tHP" << std::endl;
-            for (int i = 0; i < list.size()-1; i++) {
-                std::cout << "[ " << i << "]\t" << list[i].num << "\t" <<
-                list[i].name << "\t" << list[i].type1 << "\t" << list[i].hp << std::endl;
+            int index = 0;
+            std::cout << "\t#\tName\tType 1\tHP\n";
+            for (const auto& data : list) {
+                std::cout << "[" << std::setw(3) << std::right << index++ << "]";   
+                std::cout << "\t" << data.num;
+                std::cout << "\t" << data.name;
+                std::cout << "\t" << data.type1;
+                std::cout << "\t" << data.hp << "\n";
             }
+            std::cout << "HP tree height = " << list.size() << "\n";
         }
-        static void printTask2(const Statics& data) {
-            std::cout << "\t" << data.num << "\t" << data.name << "\t" <<
-            data.type1 << "\t" << data.total << "\t" << data.hp << "\t" <<
-            data.atk << "\t" << data.def << std::endl;
+
+        static void printTask2(const std::vector<int>& list, const std::vector<Statics>& main_list, int count_visited) {
+            std::cout << "\t#\tName\tType 1\tHP\n";
+            int i = 0;
+            for (const auto& index : list) {
+                if (index != -1) {
+                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";   
+                    std::cout << "\t" << main_list[index].num;
+                    std::cout << "\t" << main_list[index].name;
+                    std::cout << "\t" << main_list[index].type1;
+                    std::cout << "\t" << main_list[index].total;
+                    std::cout << "\t" << main_list[index].hp;
+                    std::cout << "\t" << main_list[index].atk;
+                    std::cout << "\t" << main_list[index].def << "\n";
+                }
+            }
+            std::cout << "Number of visited nodes = " << count_visited << "\n";
         }
-        static void printTask3(const Statics& data) {
-            std::cout << "\t" << data.num << "\t" << data.name << "\t" <<
-            data.type1 << "\t" << data.total << "\t" << data.hp << "\t" <<
-            data.atk << "\t" << data.def << "\t" << data.sp_atk << "\t" << data.sp_def << std::endl;
+
+        static void printTask3(const std::vector<Statics>& main_list, int rec_hp, int height) {
+            int i = 0;
+            std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\tSp .Atk\tSp .Def\n";
+            for (const auto& data : main_list) {
+                if (data.hp == rec_hp) {
+                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";   
+                    std::cout << "\t" << data.num;
+                    std::cout << "\t" << data.name;
+                    std::cout << "\t" << data.type1;
+                    std::cout << "\t" << data.total;
+                    std::cout << "\t" << data.hp; 
+                    std::cout << "\t" << data.atk;
+                    std::cout << "\t" << data.def;
+                    std::cout << "\t" << data.sp_atk;
+                    std::cout << "\t" << data.sp_def << "\n";
+                }
+            }
+            std::cout << "HP tree height = " << height << "\n";
+        }
+
+        static void printTask4() {
+            // TODO
         }
 };
+
+class System {
+    private:
+        std::vector<Statics> main_list;
+        std::size_t size;
+        BinarySearchTree root;
+        int height;
+        bool deletemin;
+    public:
+        System() {
+            size = 0;
+            height = 0;
+            deletemin = true;
+        }
+
+        Node* add(int num, int hp, Node *tree) {
+            if (tree == nullptr) {
+                Node* new_node = new Node;
+                new_node -> hp = hp;
+                new_node -> left = nullptr;
+                new_node -> right = nullptr;
+                new_node -> number_list.push_back(num);
+                tree = new_node;
+                return tree;
+            } else if (tree -> hp < hp) {
+                tree -> left = add(num, hp, tree -> left);
+                return tree;
+            } else if (tree -> hp > hp) {
+                tree -> right = add(num, hp, tree -> right);
+                return tree;
+            } else if (tree -> hp == hp) {
+                tree -> number_list.push_back(num);
+                return tree;
+            }
+            return tree;
+        }
+
+        int findInRange(int lower, int upper, Node *tree, std::vector<int>& list) {
+            if (!tree) {
+                return 0;
+            }
+            Node *cur = tree;
+            std::size_t count = 0;
+            if (lower > cur -> hp) 
+                count += findInRange(lower, upper, tree->right, list);
+            if (lower <= cur -> hp && upper >= cur -> hp) {
+                for (auto number : cur -> number_list) {
+                    list.push_back(number);
+                }
+                count += cur -> number_list.size();
+            }
+            if (upper < cur -> hp)
+                count += findInRange(lower, upper, tree->left, list);
+            return count;
+        }
+
+        void task1() {
+            std::string prefix;
+            while (true) {
+                std::cout << "Input a file number [0: quit]: ";
+                std::cin >> prefix;
+                std::cout << "\n";
+                if (!std::ifstream("input" + prefix + ".txt")) {
+                    std::cout << "### input" + prefix + ".txt does not exist! ###\n\n";
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            root.set(nullptr); 
+            for (const auto& data : main_list) {
+                root.set( add(data.num, data.hp, root.top()) );
+            }
+            IO::readFile(prefix, main_list);
+            IO::printTask1(main_list);
+        }
+
+        void task2() {
+            std::string input1, input2;
+            int num1, num2;
+            std::vector<int> list;
+            int index;
+            while (true) {
+                std::cout << "Input a non-negative integer: ";
+                std::cin >> input1;
+                std::cout << "\n";
+                try {
+                    num1 = std::stoi(input1);
+                    if (num1 < 0) {
+                        throw num1;
+                    }
+                    break;
+                } catch (...) {
+                    std::cout << "### It is NOT a non-negative integer. ###\nTry again:\n";
+                    continue;   
+                }
+            }
+            while (true) {
+                std::cout << "Input a non-negative integer: ";
+                std::cin >> input2;
+                std::cout << "\n";
+                try {
+                    num2 = std::stoi(input2);
+                    if (num2 < 0) {
+                        throw num2;
+                    }
+                    break;
+                } catch (...) {
+                    std::cout << "### It is NOT a non-negative integer. ###\nTry again:\n";
+                    continue;   
+                }
+            }
+            Node* cur = root.top();
+            if (num1 > num2) 
+                std::swap(num1, num2);
+            int count_visited = findInRange(num1, num2, cur, list);
+            IO::printTask2(list, main_list, count_visited);
+        }
+        
+        void task3() {
+            int rec_hp;
+            bool found = false;
+            if (deletemin) {
+                rec_hp = root.deleteMin();
+            } else {
+                rec_hp = root.deleteMax();
+            }
+            int height = root.height(root.top());
+            IO::printTask3(main_list, rec_hp, height);
+            std::erase_if(main_list, [&rec_hp](const auto& data) {return data.hp == rec_hp;});
+        }
+
+        void task4() {
+            // TODO
+        }
+
+        void run() {
+            int task_number;
+            while (true) {
+                std::cout << "*** (^_^) Data Structure (^o^) ***\n";
+                std::cout << "** Binary Search Tree on Pokemon *\n";
+                std::cout << "* 0. QUIT                        *\n";
+                std::cout << "* 1. Read a file to build HP BST *\n";
+                std::cout << "* 2. Range search on HP field    *\n";
+                std::cout << "* 3. Delete the min on HP field  *\n";
+                std::cout << "* 4. Rebuild the balanced HP BST *\n";
+                std::cout << "**********************************\n";
+                std::cout << "Input a choice(0, 1, 2, 3, 4): ";
+                std::cin >> task_number;
+                std::cout << "\n";
+                if (task_number == 1) {
+                    task1();
+                } else if (task_number == 2) {
+                    task2();
+                } else if (task_number == 3) {
+                    task3();
+                } else if (task_number == 4) {
+                    task4();
+                } else if (task_number == 0) {
+                    break;
+                } else {
+                    std::cout << "command does not exist.\n";
+                }
+            }
+        }
+};
+
+
+int main () {
+    System system;
+    system.run();
+    return 0;   
+}
