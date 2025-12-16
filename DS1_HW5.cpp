@@ -79,7 +79,7 @@ class BinarySearchTree {
         int deleteMax() {
             Node *cur = root;
             Node *parent = nullptr;
-            if (!cur) 
+            if (!cur)
                 return 0;
             while (cur -> right) {
                 parent = cur;
@@ -96,7 +96,7 @@ class BinarySearchTree {
             int rec_hp = cur -> hp;
             delete cur;
             return rec_hp;
-        } 
+        }
 
         int deleteMin() {
             Node *cur = root;
@@ -177,7 +177,7 @@ class System {
         int findInRange(int lower, int upper, Node *tree, std::vector<int>& list) {
             Node *cur = tree;
             std::size_t count = 0;
-            if (lower > cur -> hp) 
+            if (lower > cur -> hp)
                 count += findInRange(lower, upper, tree->left, list);
             if (lower <= cur -> hp && upper >= cur -> hp) {
                 for (auto number : cur -> number_list) {
@@ -205,11 +205,13 @@ class System {
             std::vector<int> list;
             int index;
             Node* cur = root.top();
-            if (num1 > num2) 
+            if (num1 > num2)
                 std::swap(num1, num2);
             int count_visited = findInRange(num1, num2, cur, list);
+            std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense" << std::endl;
             for (int i = 0; i < list.size(); i++) {
                 index = binarySearch(list[i]);
+                std::cout << "[ " << i+1 << "]";
                 IO::printTask2(main_list[index]);
             }
         }
@@ -276,7 +278,17 @@ class IO {
             }
         }
 
-        static void printTask1(const std::vector<Statics>& list);
-        static void printTask2(Statics data);
-        static void printTask3(Statics data);
+        static void printTask1(const std::vector<Statics>& list) {
+            std::cout << "\t#\tName\tType 1\tHP" << std::endl;
+            for (int i = 0; i < list.size()-1; i++) {
+                std::cout << "[ " << i << "]\t" << list[i].num << "\t" <<
+                list[i].name << "\t" << list[i].type1 << "\t" << list[i].hp << std::endl;
+            }
+        }
+        static void printTask2(const Statics& data) {
+            std::cout << "\t" << data.num << "\t" << data.name << "\t" <<
+            data.type1 << "\t" << data.total << "\t" << data.hp << "\t" <<
+            data.atk << "\t" << data.def << std::endl;
+        }
+        static void printTask3(const Statics& data);
 };
