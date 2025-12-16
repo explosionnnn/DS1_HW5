@@ -88,17 +88,46 @@ class BinarySearchTree {
             }
         }
 
-        Bst* FindMax(Bst *cur) {
+
+        int DeleteMax() {
+            Bst *cur = tree;
+            Bst *parent = nullptr;
             if (cur == nullptr) {
-                return cur;
+                return 0;
             }
             while (cur -> right != nullptr) {
+                parent = cur;
                 cur = cur -> right;
             }
-
-            return cur;
+            if (parent == nullptr) { //root
+                tree = cur -> left;
+            } else {
+                parent->right = cur->left;
+            }
+            int rec_hp = cur -> list[0].hp;
+            delete cur;
+            return rec_hp;
         }
 
+        int DeleteMin() {
+            Bst *cur = tree;
+            Bst *parent = nullptr;
+            if (cur == nullptr) {
+                return 0;
+            }
+            while (cur -> left != nullptr) {
+                parent = cur;
+                cur = cur -> left;
+            }
+            if (parent == nullptr) { //root
+                tree = cur -> right;
+            } else {
+                parent->left = cur->right;
+            }
+            int rec_hp = cur -> list[0].hp;
+            delete cur;
+            return rec_hp;
+        }
 };
 
 class System {
@@ -107,10 +136,12 @@ class System {
         int main_list_size;
         BinarySearchTree bst;
         int tree_height;
+        bool deletemin;
     public:
         System() {
             main_list_size = 0;
             tree_height = 0;
+            deletemin = true;
         }
 
         int binarySearch(int target) {
@@ -197,6 +228,32 @@ class System {
             for (int i = 0; i < list.size(); i++) {
                 index = binarySearch(list[i]);
                 PrintTask2(main_list[index]); //hasn't design
+            }
+        }
+
+        void Task3() {
+            int rec_hp;
+            bool found = false;
+            if (deletemin) {
+                rec_hp = bst.DeleteMin();
+            } else {
+                rec_hp = bst.DeleteMax();
+            }
+            if (rec_hp != 0) {
+                while (true) {
+                    found = false;
+                    for (int i = 0; i < main_list.size()-1; i++) {
+                        if (rec_hp == main_list[i].hp) {
+                            Print3(i); //hasn't design
+                            main_list.erase(main_list.begin()+i);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        break;
+                    }
+                }
             }
         }
 };
