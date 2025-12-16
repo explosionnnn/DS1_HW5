@@ -199,6 +199,7 @@ class System {
             }
             IO::readFile(prefix, main_list);
             IO::printTask1(main_list);
+            std::cout << "HP tree height = " << height << std::endl;
         }
 
         void Task2(int num1, int num2) {
@@ -218,6 +219,7 @@ class System {
 
         void Task3() {
             int rec_hp;
+            int count = 1;
             bool found = false;
             if (deletemin) {
                 rec_hp = root.deleteMin();
@@ -227,9 +229,11 @@ class System {
             if (rec_hp != 0) {
                 while (true) {
                     found = false;
+                    std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\tSp. Atk\tSp. Def" << std::endl;
                     for (int i = 0; i < main_list.size()-1; i++) {
                         if (rec_hp == main_list[i].hp) {
-                            IO::printTask3(main_list[i]); //hasn't design
+                            std::cout << "[ " << count+1 << "]";
+                            IO::printTask3(main_list[i]);
                             main_list.erase(main_list.begin()+i);
                             found = true;
                             break;
@@ -239,6 +243,11 @@ class System {
                         break;
                     }
                 }
+                height = root.height(root.top());
+                std::cout << "HP tree height = " << height << std::endl;
+                deletemin= true;
+            } else {
+                std::cout << "----- Execute Mission 1 first! -----" << std::endl;
             }
         }
 };
@@ -290,5 +299,9 @@ class IO {
             data.type1 << "\t" << data.total << "\t" << data.hp << "\t" <<
             data.atk << "\t" << data.def << std::endl;
         }
-        static void printTask3(const Statics& data);
+        static void printTask3(const Statics& data) {
+            std::cout << "\t" << data.num << "\t" << data.name << "\t" <<
+            data.type1 << "\t" << data.total << "\t" << data.hp << "\t" <<
+            data.atk << "\t" << data.def << "\t" << data.sp_atk << "\t" << data.sp_def << std::endl;
+        }
 };
