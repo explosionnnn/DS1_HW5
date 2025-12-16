@@ -76,49 +76,47 @@ class BinarySearchTree {
             return std::max(right, left) + 1;
         }
 
-
-        int DeleteMax() {
-            Bst *cur = tree;
-            Bst *parent = nullptr;
-            if (cur == nullptr) {
+        int deleteMax() {
+            Node *cur = root;
+            Node *parent = nullptr;
+            if (!cur) 
                 return 0;
-        Node* max(Node *tree) {
-            if (tree == nullptr) {
-                return tree;
-            }
-            while (cur -> right != nullptr) {
+            while (cur -> right) {
                 parent = cur;
                 cur = cur -> right;
-            while (tree -> right) {
-                tree = tree -> right;
             }
-            if (parent == nullptr) { //root
-                tree = cur -> left;
+            if (!parent) { //root
+                if (cur -> left)
+                    root = cur -> left;
+                else
+                    root = nullptr;
             } else {
                 parent->right = cur->left;
             }
-            int rec_hp = cur -> list[0].hp;
+            int rec_hp = cur -> hp;
             delete cur;
             return rec_hp;
-            return tree;
-        }
+        } 
 
-        int DeleteMin() {
-            Bst *cur = tree;
-            Bst *parent = nullptr;
-            if (cur == nullptr) {
+        int deleteMin() {
+            Node *cur = root;
+            Node *parent = nullptr;
+            if (!cur) {
                 return 0;
             }
-            while (cur -> left != nullptr) {
+            while (cur -> left) {
                 parent = cur;
                 cur = cur -> left;
             }
-            if (parent == nullptr) { //root
-                tree = cur -> right;
+            if (!parent) { // root
+                if (cur -> right)
+                    root = cur -> right;
+                else
+                    root = nullptr;
             } else {
                 parent->left = cur->right;
             }
-            int rec_hp = cur -> list[0].hp;
+            int rec_hp = cur -> hp;
             delete cur;
             return rec_hp;
         }
@@ -130,17 +128,11 @@ class System {
         std::size_t size;
         BinarySearchTree root;
         int height;
-        std::vector<Main> main_list;
-        int main_list_size;
-        BinarySearchTree bst;
-        int tree_height;
         bool deletemin;
     public:
         System() {
             size = 0;
             height = 0;
-            main_list_size = 0;
-            tree_height = 0;
             deletemin = true;
         }
 
@@ -221,6 +213,32 @@ class System {
                 IO::printTask2(main_list[index]);
             }
         }
+
+        void Task3() {
+            int rec_hp;
+            bool found = false;
+            if (deletemin) {
+                rec_hp = root.deleteMin();
+            } else {
+                rec_hp = root.deleteMax();
+            }
+            if (rec_hp != 0) {
+                while (true) {
+                    found = false;
+                    for (int i = 0; i < main_list.size()-1; i++) {
+                        if (rec_hp == main_list[i].hp) {
+                            IO::printTask3(main_list[i]); //hasn't design
+                            main_list.erase(main_list.begin()+i);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        break;
+                    }
+                }
+            }
+        }
 };
 
 class IO {
@@ -260,34 +278,5 @@ class IO {
 
         static void printTask1(const std::vector<Statics>& list);
         static void printTask2(Statics data);
-}; 
-                PrintTask2(main_list[index]); //hasn't design
-            }
-        }
-
-        void Task3() {
-            int rec_hp;
-            bool found = false;
-            if (deletemin) {
-                rec_hp = bst.DeleteMin();
-            } else {
-                rec_hp = bst.DeleteMax();
-            }
-            if (rec_hp != 0) {
-                while (true) {
-                    found = false;
-                    for (int i = 0; i < main_list.size()-1; i++) {
-                        if (rec_hp == main_list[i].hp) {
-                            Print3(i); //hasn't design
-                            main_list.erase(main_list.begin()+i);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        break;
-                    }
-                }
-            }
-        }
+        static void printTask3(Statics data);
 };
