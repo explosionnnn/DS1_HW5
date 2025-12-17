@@ -188,7 +188,7 @@ class IO {
             int index = 1;
             std::cout << "\t#\tName\tType 1\tHP\n";
             for (const auto& data : list) {
-                std::cout << "[" << std::setw(3) << std::right << index++ << "]";   
+                std::cout << "[" << std::setw(3) << std::right << index++ << "]";
                 std::cout << "\t" << data.num;
                 std::cout << "\t" << data.name;
                 std::cout << "\t" << data.type1;
@@ -203,7 +203,7 @@ class IO {
             for (const auto& id : list) {
                 auto it = std::find_if(main_list.begin(), main_list.end(), [id](const Statics& s) { return s.num == id; });
                 if (it != main_list.end()) {
-                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";   
+                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";
                     std::cout << "\t" << it->num;
                     std::cout << "\t" << it->name;
                     std::cout << "\t" << it->type1;
@@ -216,21 +216,24 @@ class IO {
             std::cout << "Number of visited nodes = " << count_visited << "\n\n";
         }
 
-        static void printTask3(const std::vector<Statics>& main_list, int rec_hp, int height) {
+        static void printTask3(std::vector<Statics>& main_list, int rec_hp, int height) {
             int i = 1;
             std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\tSp .Atk\tSp .Def\n";
-            for (const auto& data : main_list) {
-                if (data.hp == rec_hp) {
-                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";   
-                    std::cout << "\t" << data.num;
-                    std::cout << "\t" << data.name;
-                    std::cout << "\t" << data.type1;
-                    std::cout << "\t" << data.total;
-                    std::cout << "\t" << data.hp; 
-                    std::cout << "\t" << data.atk;
-                    std::cout << "\t" << data.def;
-                    std::cout << "\t" << data.sp_atk;
-                    std::cout << "\t" << data.sp_def << "\n";
+            for (auto it = main_list.begin(); it != main_list.end();) {
+                if (it -> hp == rec_hp) {
+                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";
+                    std::cout << "\t" << it -> num;
+                    std::cout << "\t" << it -> name;
+                    std::cout << "\t" << it -> type1;
+                    std::cout << "\t" << it -> total;
+                    std::cout << "\t" << it -> hp;
+                    std::cout << "\t" << it -> atk;
+                    std::cout << "\t" << it -> def;
+                    std::cout << "\t" << it -> sp_atk;
+                    std::cout << "\t" << it -> sp_def << "\n";
+                    it = main_list.erase(it); //回傳跳到下一個位置
+                } else {
+                    it++;
                 }
             }
             std::cout << "HP tree height = " << height << "\n\n";
@@ -261,7 +264,7 @@ class System {
             }
             Node *cur = tree;
             std::size_t count = 0;
-            if (upper > cur -> hp) 
+            if (upper > cur -> hp)
                 count += findInRange(lower, upper, tree->right, list);
             if (lower <= cur -> hp && upper >= cur -> hp) {
                 for (auto number : cur -> number_list) {
@@ -269,7 +272,7 @@ class System {
                 }
                 count += cur -> number_list.size();
             }
-            if (lower < cur -> hp) 
+            if (lower < cur -> hp)
                 count += findInRange(lower, upper, tree->left, list);
             return count;
         }
@@ -289,7 +292,7 @@ class System {
             }
             main_list.clear();
             root.clear(root.top());
-            root.set(nullptr); 
+            root.set(nullptr);
             IO::readFile(prefix, main_list);
             for (const auto& data : main_list) {
                 root.set(root.add(data.num, data.hp, root.top()));
@@ -318,7 +321,7 @@ class System {
                     break;
                 } catch (...) {
                     std::cout << "### It is NOT a non-negative integer. ###\nTry again:\n";
-                    continue;   
+                    continue;
                 }
             }
             while (true) {
@@ -333,16 +336,16 @@ class System {
                     break;
                 } catch (...) {
                     std::cout << "### It is NOT a non-negative integer. ###\nTry again:\n";
-                    continue;   
+                    continue;
                 }
             }
             Node* cur = root.top();
-            if (num1 > num2) 
+            if (num1 > num2)
                 std::swap(num1, num2);
             int count_visited = findInRange(num1, num2, cur, list);
             IO::printTask2(list, main_list, count_visited);
         }
-        
+
         void task3() {
             if (root.empty()) {
                 std::cout << "----- Execute Mission 1 first! -----\n\n";
@@ -359,7 +362,13 @@ class System {
             }
             int height = root.height(root.top());
             IO::printTask3(main_list, rec_hp, height);
-            std::erase_if(main_list, [&rec_hp](const auto& data) {return data.hp == rec_hp;});
+            for (auto it = main_list.begin(); it != main_list.end();) {
+                if (it -> hp == rec_hp) {
+                    main_list.erase(it);
+                } else {
+                    it++;
+                }
+            }
         }
 
         void task4() {
@@ -406,5 +415,5 @@ class System {
 int main () {
     System system;
     system.run();
-    return 0;   
+    return 0;
 }
