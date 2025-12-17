@@ -6,6 +6,8 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <queue>
+#include <utility>
 
 struct Node {
     std::vector<int> number_list;
@@ -38,7 +40,11 @@ class BinarySearchTree {
             root = nullptr;
         }
 
-        Node* top() {
+        ~BinarySearchTree() {
+            clear(root);
+        }
+
+        Node* top() const {
             return root;
         }
 
@@ -88,6 +94,17 @@ class BinarySearchTree {
                 return tree;
             }
             return tree;
+        }
+
+        Node* balance(std::vector<std::pair<int, std::vector<int>>>& inorder_nodes, int left, int right) {
+            if (left > right) { return nullptr; }
+            int mid = (left + right) / 2;
+            Node* new_node = new Node;
+            new_node -> hp = inorder_nodes[mid].first;
+            new_node -> number_list = inorder_nodes[mid].second;
+            new_node -> left = balance(inorder_nodes, left, mid - 1);
+            new_node -> right = balance(inorder_nodes, mid + 1, right);
+            return new_node;
         }
 
         int deleteMax() {
@@ -142,7 +159,21 @@ class BinarySearchTree {
                 delete tree;
             }
         }
-};
+
+        void inOrderHelper(Node* tree, std::vector<std::pair<int, std::vector<int>>>& result) {
+            if (tree) {
+                inOrderHelper(tree->left, result);
+                result.push_back({tree->hp, tree->number_list});
+                inOrderHelper(tree->right, result);
+            }
+        }
+
+        std::vector<std::pair<int, std::vector<int>>> inOrder(Node* tree) {
+            std::vector<std::pair<int, std::vector<int>>> result;
+            inOrderHelper(tree, result);
+            return result;
+        }
+    };
 
 class IO {
     public:
@@ -238,9 +269,33 @@ class IO {
             std::cout << "HP tree height = " << height << "\n\n";
         }
 
-        static void printTask4() {
-            // TODO
+        static void printTask4(const Node* tree) {
+            if (!tree) return;
+            std::queue<const Node*> q;
+            q.push(tree);
+            int level = 1;
+            while (!q.empty()) {
+                int size = q.size();
+                std::cout << "<level " << level++ << ">";
+                for (int i = 0; i < size; ++i) {
+                    const Node* cur = q.front();
+                    q.pop();
+                    std::cout << " (" << cur->hp << ", ";
+                    int last_value = cur->number_list.back();
+                    for (const auto& value : cur->number_list) {
+                        std::cout << value;
+                        if (value != last_value) {
+                            std::cout << "|";
+                        }
+                    }
+                    std::cout << ")";
+                    if (cur->left) { q.push(cur->left); }
+                    if (cur->right) { q.push(cur->right); }
+                }
+                std::cout << "\n";
+            }
         }
+
 };
 
 class System {
@@ -250,6 +305,7 @@ class System {
         BinarySearchTree root;
         int height;
         bool deletemin;
+        BinarySearchTree balanced_root;
     public:
         System() {
             size = 0;
@@ -363,11 +419,20 @@ class System {
         }
 
         void task4() {
-            // TODO
+            if (root.empty()) {
+                std::cout << "----- Execute Mission 1 first! -----\n\n";
+                return;
+            }
+            balanced_root.clear(balanced_root.top());
+            std::vector<std::pair<int, std::vector<int>>> in_order = root.inOrder(root.top());
+            balanced_root.set(balanced_root.balance(in_order, 0, in_order.size() - 1));
+            IO::printTask4(balanced_root.top());
+            std::cout << "\n";
         }
 
         void run() {
             std::string task_input;
+            int task_number;
             while (true) {
                 std::cout << "*** (^_^) Data Structure (^o^) ***\n";
                 std::cout << "** Binary Search Tree on Pokemon *\n";
@@ -381,21 +446,22 @@ class System {
                 std::cin >> task_input;
                 std::cout << "\n";
                 try {
-                    int task_number = std::stoi(task_input);
-                    if (task_number == 1) {
-                        task1();
-                    } else if (task_number == 2) {
-                        task2();
-                    } else if (task_number == 3) {
-                        task3();
-                    } else if (task_number == 4) {
-                        task4();
-                    } else if (task_number == 0) {
-                        break;
-                    } else {
-                        std::cout << "Command does not exist!\n\n";
-                    }
+                    task_number = std::stoi(task_input);
                 } catch (...) {
+                    std::cout << "Command does not exist!\n\n";
+                    continue;
+                }
+                if (task_number == 1) {
+                    task1();
+                } else if (task_number == 2) {
+                    task2();
+                } else if (task_number == 3) {
+                    task3();
+                } else if (task_number == 4) {
+                    task4();
+                } else if (task_number == 0) {
+                    break;
+                } else {
                     std::cout << "Command does not exist!\n\n";
                 }
             }
