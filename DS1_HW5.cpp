@@ -7,10 +7,9 @@
 #include <iomanip>
 #include <algorithm>
 
-template<typename T1, typename T2>
 struct Node {
-    T1 key;
-    std::vector<T2> value_list;
+    std::vector<int> number_list;
+    int hp;
     Node *right;
     Node *left;
 };
@@ -31,28 +30,27 @@ struct Statics {
     std::string legendary;
 };
 
-template<class T1 = int, class T2 = int> // <key type, value type>
 class BinarySearchTree {
     private:
-        Node<T1, T2>* root;
+        Node* root;
     public:
         BinarySearchTree() {
             root = nullptr;
         }
 
-        Node<T1, T2>* top() {
+        Node* top() {
             return root;
         }
 
-        Node<T1, T2>* right() {
+        Node* right() {
             return root->right;
         }
 
-        Node<T1, T2>* left() {
+        Node* left() {
             return root->left;
         }
 
-        void set(Node<T1, T2>* node) {
+        void set(Node* node) {
             this -> root = node;
         }
 
@@ -60,8 +58,8 @@ class BinarySearchTree {
             return root == nullptr;
         }
 
-        int height(Node<T1, T2>* tree) {
-            Node<T1, T2>* cur = tree;
+        int height(Node* tree) {
+            Node* cur = tree;
             if (cur == nullptr) {
                 return 0;
             }
@@ -70,34 +68,33 @@ class BinarySearchTree {
             return std::max(right, left) + 1;
         }
 
-        Node<T1, T2>* add(T2 num, T1 key, Node<T1, T2>* tree) {
+        Node* add(int num, int hp, Node *tree) {
             if (tree == nullptr) {
-                Node<T1, T2>* new_node = new Node<T1, T2>;
-                new_node -> key = key;
+                Node* new_node = new Node;
+                new_node -> hp = hp;
                 new_node -> left = nullptr;
                 new_node -> right = nullptr;
-                new_node -> value_list.push_back(num);
+                new_node -> number_list.push_back(num);
                 tree = new_node;
                 return tree;
-            } else if (tree -> key < key) {
-                tree -> right = add(num, key, tree -> right);
+            } else if (tree -> hp < hp) {
+                tree -> right = add(num, hp, tree -> right);
                 return tree;
-            } else if (tree -> key > key) {
-                tree -> left = add(num, key, tree -> left);
+            } else if (tree -> hp > hp) {
+                tree -> left = add(num, hp, tree -> left);
                 return tree;
-            } else if (tree -> key == key) {
-                auto pos = std::lower_bound(tree -> value_list.begin(), tree -> value_list.end(), num);
-                tree -> value_list.insert(pos, num); // keep ascending order
+            } else if (tree -> hp == hp) {
+                tree -> number_list.push_back(num);
                 return tree;
             }
             return tree;
         }
 
-        T1 deleteMax() {
-            Node<T1, T2> *cur = root;
-            Node<T1, T2> *parent = nullptr;
+        int deleteMax() {
+            Node *cur = root;
+            Node *parent = nullptr;
             if (!cur)
-                return T1();
+                return 0;
             while (cur -> right) {
                 parent = cur;
                 cur = cur -> right;
@@ -110,16 +107,16 @@ class BinarySearchTree {
             } else {
                 parent->right = cur->left;
             }
-            T1 rec_key = cur -> key;
+            int rec_hp = cur -> hp;
             delete cur;
-            return rec_key;
+            return rec_hp;
         }
 
-        T1 deleteMin() {
-            Node<T1, T2> *cur = root;
-            Node<T1, T2> *parent = nullptr;
+        int deleteMin() {
+            Node *cur = root;
+            Node *parent = nullptr;
             if (!cur) {
-                return T1();
+                return 0;
             }
             while (cur -> left) {
                 parent = cur;
@@ -133,12 +130,12 @@ class BinarySearchTree {
             } else {
                 parent->left = cur->right;
             }
-            T1 rec_key = cur -> key;
+            int rec_hp = cur -> hp;
             delete cur;
-            return rec_key;
+            return rec_hp;
         }
 
-        void clear(Node<T1, T2>* tree) {
+        void clear(Node* tree) {
             if (tree) {
                 clear(tree -> left);
                 clear(tree -> right);
@@ -190,7 +187,7 @@ class IO {
             int index = 1;
             std::cout << "\t#\tName\tType 1\tHP\n";
             for (const auto& data : list) {
-                std::cout << "[" << std::setw(3) << std::right << index++ << "]";   
+                std::cout << "[" << std::setw(3) << std::right << index++ << "]";
                 std::cout << "\t" << data.num;
                 std::cout << "\t" << data.name;
                 std::cout << "\t" << data.type1;
@@ -205,7 +202,7 @@ class IO {
             for (const auto& id : list) {
                 auto it = std::find_if(main_list.begin(), main_list.end(), [id](const Statics& s) { return s.num == id; });
                 if (it != main_list.end()) {
-                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";   
+                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";
                     std::cout << "\t" << it->num;
                     std::cout << "\t" << it->name;
                     std::cout << "\t" << it->type1;
@@ -218,21 +215,24 @@ class IO {
             std::cout << "Number of visited nodes = " << count_visited << "\n\n";
         }
 
-        static void printTask3(const std::vector<Statics>& main_list, int rec_hp, int height) {
+        static void printTask3(std::vector<Statics>& main_list, int rec_hp, int height) {
             int i = 1;
             std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\tSp .Atk\tSp .Def\n";
-            for (const auto& data : main_list) {
-                if (data.hp == rec_hp) {
-                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";   
-                    std::cout << "\t" << data.num;
-                    std::cout << "\t" << data.name;
-                    std::cout << "\t" << data.type1;
-                    std::cout << "\t" << data.total;
-                    std::cout << "\t" << data.hp; 
-                    std::cout << "\t" << data.atk;
-                    std::cout << "\t" << data.def;
-                    std::cout << "\t" << data.sp_atk;
-                    std::cout << "\t" << data.sp_def << "\n";
+            for (auto it = main_list.begin(); it != main_list.end();) {
+                if (it -> hp == rec_hp) {
+                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";
+                    std::cout << "\t" << it -> num;
+                    std::cout << "\t" << it -> name;
+                    std::cout << "\t" << it -> type1;
+                    std::cout << "\t" << it -> total;
+                    std::cout << "\t" << it -> hp;
+                    std::cout << "\t" << it -> atk;
+                    std::cout << "\t" << it -> def;
+                    std::cout << "\t" << it -> sp_atk;
+                    std::cout << "\t" << it -> sp_def << "\n";
+                    it = main_list.erase(it); //回傳跳到下一個位置
+                } else {
+                    it++;
                 }
             }
             std::cout << "HP tree height = " << height << "\n\n";
@@ -247,7 +247,7 @@ class System {
     private:
         std::vector<Statics> main_list;
         std::size_t size;
-        BinarySearchTree<int, int> root;
+        BinarySearchTree root;
         int height;
         bool deletemin;
     public:
@@ -257,21 +257,21 @@ class System {
             deletemin = true;
         }
 
-        int findInRange(int lower, int upper, Node<int, int> *tree, std::vector<int>& list) {
+        int findInRange(int lower, int upper, Node *tree, std::vector<int>& list) {
             if (!tree) {
                 return 0;
             }
-            Node<int, int> *cur = tree;
+            Node *cur = tree;
             std::size_t count = 0;
-            if (upper > cur -> key) 
+            if (upper > cur -> hp)
                 count += findInRange(lower, upper, tree->right, list);
-            if (lower <= cur -> key && upper >= cur -> key) {
-                for (auto number : cur -> value_list) {
+            if (lower <= cur -> hp && upper >= cur -> hp) {
+                for (auto number : cur -> number_list) {
                     list.push_back(number);
                 }
-                count += cur -> value_list.size();
+                count += cur -> number_list.size();
             }
-            if (lower < cur -> key) 
+            if (lower < cur -> hp)
                 count += findInRange(lower, upper, tree->left, list);
             return count;
         }
@@ -291,7 +291,7 @@ class System {
             }
             main_list.clear();
             root.clear(root.top());
-            root.set(nullptr); 
+            root.set(nullptr);
             IO::readFile(prefix, main_list);
             for (const auto& data : main_list) {
                 root.set(root.add(data.num, data.hp, root.top()));
@@ -320,7 +320,7 @@ class System {
                     break;
                 } catch (...) {
                     std::cout << "### It is NOT a non-negative integer. ###\nTry again:\n";
-                    continue;   
+                    continue;
                 }
             }
             while (true) {
@@ -335,23 +335,22 @@ class System {
                     break;
                 } catch (...) {
                     std::cout << "### It is NOT a non-negative integer. ###\nTry again:\n";
-                    continue;   
+                    continue;
                 }
             }
-            Node<int, int>* cur = root.top();
-            if (num1 > num2) 
+            Node* cur = root.top();
+            if (num1 > num2)
                 std::swap(num1, num2);
             int count_visited = findInRange(num1, num2, cur, list);
             IO::printTask2(list, main_list, count_visited);
         }
-        
+
         void task3() {
             if (root.empty()) {
                 std::cout << "----- Execute Mission 1 first! -----\n\n";
                 return;
             }
             int rec_hp;
-            bool found = false;
             if (deletemin) {
                 rec_hp = root.deleteMin();
                 deletemin = false;
@@ -361,7 +360,6 @@ class System {
             }
             int height = root.height(root.top());
             IO::printTask3(main_list, rec_hp, height);
-            std::erase_if(main_list, [&rec_hp](const auto& data) {return data.hp == rec_hp;});
         }
 
         void task4() {
@@ -404,8 +402,9 @@ class System {
         }
 };
 
+
 int main () {
     System system;
     system.run();
-    return 0;   
+    return 0;
 }
