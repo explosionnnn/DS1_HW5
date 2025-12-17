@@ -185,13 +185,13 @@ class IO {
 
         static void printTask1(const std::vector<Statics>& list, int height) {
             int index = 1;
-            std::cout << "\t#\tName\tType 1\tHP\n";
+            std::cout << "\t#\tName" << std::setw(22) << "\tType 1"<< std::setw(8) << "\tHP\n";
             for (const auto& data : list) {
                 std::cout << "[" << std::setw(3) << std::right << index++ << "]";
-                std::cout << "\t" << data.num;
-                std::cout << "\t" << data.name;
-                std::cout << "\t" << data.type1;
-                std::cout << "\t" << data.hp << "\n";
+                std::cout << "\t" << data.num;                                  // num
+                std::cout << "\t" << std::setw(20) << std::left << data.name;  // name (20)
+                std::cout << "\t" << std::setw(10) << std::left << data.type1; // type1 (10)
+                std::cout << "\t" << std::setw(6) << std::left << data.hp <<"\n";            // hp
             }
             std::cout << "HP tree height = " << height << "\n\n";
         }
@@ -281,7 +281,6 @@ class System {
             while (true) {
                 std::cout << "Input a file number [0: quit]: ";
                 std::cin >> prefix;
-                std::cout << "\n";
                 if (!std::ifstream("input" + prefix + ".txt")) {
                     std::cout << "### input" + prefix + ".txt does not exist! ###\n\n";
                     continue;
