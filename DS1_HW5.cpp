@@ -362,13 +362,6 @@ class System {
             }
             int height = root.height(root.top());
             IO::printTask3(main_list, rec_hp, height);
-            for (auto it = main_list.begin(); it != main_list.end();) {
-                if (it -> hp == rec_hp) {
-                    main_list.erase(it);
-                } else {
-                    it++;
-                }
-            }
         }
 
         void task4() {
