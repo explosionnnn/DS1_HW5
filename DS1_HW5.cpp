@@ -305,7 +305,6 @@ class System {
         BinarySearchTree root;
         int height;
         bool deletemin;
-        BinarySearchTree balanced_root;
     public:
         System() {
             size = 0;
@@ -319,13 +318,13 @@ class System {
             }
             Node *cur = tree;
             std::size_t count = 0;
+            count++;
             if (upper > cur -> hp)
                 count += findInRange(lower, upper, tree->right, list);
             if (lower <= cur -> hp && upper >= cur -> hp) {
                 for (auto number : cur -> number_list) {
                     list.push_back(number);
                 }
-                count += cur -> number_list.size();
             }
             if (lower < cur -> hp)
                 count += findInRange(lower, upper, tree->left, list);
@@ -423,10 +422,10 @@ class System {
                 std::cout << "----- Execute Mission 1 first! -----\n\n";
                 return;
             }
-            balanced_root.clear(balanced_root.top());
-            std::vector<std::pair<int, std::vector<int>>> in_order = root.inOrder(root.top());
-            balanced_root.set(balanced_root.balance(in_order, 0, in_order.size() - 1));
-            IO::printTask4(balanced_root.top());
+            std::vector<std::pair<int, std::vector<int>>> in_order_nodes = root.inOrder(root.top());
+            root.clear(root.top());
+            root.set(root.balance(in_order_nodes, 0, in_order_nodes.size() - 1));
+            IO::printTask4(root.top());
             std::cout << "\n";
         }
 
@@ -467,7 +466,6 @@ class System {
             }
         }
 };
-
 
 int main () {
     System system;
