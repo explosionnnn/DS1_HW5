@@ -177,6 +177,21 @@ class BinarySearchTree {
 
 class IO {
     public:
+
+        static int binarySearch(const int &target, const std::vector<Statics> &main_list) {
+            int l = 0, r = main_list.size() - 1;
+
+            while (l <= r) {
+                int mid = l + (r - l) / 2;
+                if (main_list[mid].num == target)
+                    return mid;
+                else if (main_list[mid].num < target)
+                    l = mid + 1;
+                else
+                    r = mid - 1;
+            }
+            return -1; // 找不到
+        }
         static void readFile(const std::string& prefix, std::vector<Statics>& list) {
             std::ifstream file("input" + prefix + ".txt");
             std::string header;
@@ -228,20 +243,25 @@ class IO {
         }
 
         static void printTask2(const std::vector<int>& list, const std::vector<Statics>& main_list, int count_visited) {
-            std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\n";
-            int i = 1;
-            for (const auto& id : list) {
-                auto it = std::find_if(main_list.begin(), main_list.end(), [id](const Statics& s) { return s.num == id; });
-                if (it != main_list.end()) {
-                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";
-                    std::cout << "\t" << it->num;
-                    std::cout << "\t" << it->name;
-                    std::cout << "\t" << it->type1;
-                    std::cout << "\t" << it->total;
-                    std::cout << "\t" << it->hp;
-                    std::cout << "\t" << it->atk;
-                    std::cout << "\t" << it->def << "\n";
-                }
+            std::cout << "\t#"
+                    << "\t" << "Name"
+                    << "               \t" << "Type 1"
+                    << "    \t" << "Total"
+                    << "\t" << "HP"
+                    << "\t" << "Attack"
+                    << "\t" << "Defense"
+                    << "\n";
+
+            for (int i = 0; i < list.size(); i++) {
+                int idx = binarySearch(list[i], main_list);
+                std::cout << "[" << std::setw(3) << std::right << i+1 << "]";
+                std::cout << "\t" << main_list[idx].num;
+                std::cout << "\t" << std::setw(20) << std::left << main_list[idx].name;
+                std::cout << "\t" << std::setw(10) << std::left << main_list[idx].type1;
+                std::cout << "\t" << std::setw(6) << std::left << main_list[idx].total;
+                std::cout << "\t" << main_list[idx].hp;
+                std::cout << "\t" << main_list[idx].atk;
+                std::cout << "\t" << main_list[idx].def << "\n";
             }
             std::cout << "Number of visited nodes = " << count_visited << "\n\n";
         }
@@ -363,9 +383,8 @@ class System {
             std::vector<int> list;
             int index;
             while (true) {
-                std::cout << "Input a non-negative integer: ";
+                std::cout << "Input a non-negative integer: \n";
                 std::cin >> input1;
-                std::cout << "\n";
                 try {
                     num1 = std::stoi(input1);
                     if (num1 < 0) {
@@ -380,7 +399,6 @@ class System {
             while (true) {
                 std::cout << "Input a non-negative integer: ";
                 std::cin >> input2;
-                std::cout << "\n";
                 try {
                     num2 = std::stoi(input2);
                     if (num2 < 0) {
