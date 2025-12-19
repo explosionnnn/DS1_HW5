@@ -360,14 +360,14 @@ class System {
             }
             Node *cur = tree;
             std::size_t count = 1;
-            if (upper >= cur -> hp)
+            if (upper > cur -> hp)
                 count += findInRange(lower, upper, tree->right, list);
             if (lower <= cur -> hp && upper >= cur -> hp) {
                 for (auto number : cur -> number_list) {
                     list.push_back(number);
                 }
             }
-            if (lower <= cur -> hp)
+            if (lower < cur -> hp)
                 count += findInRange(lower, upper, tree->left, list);
             return count;
         }
