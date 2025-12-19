@@ -177,6 +177,13 @@ class BinarySearchTree {
 
 class IO {
     public:
+        static bool isNumber (const char& c) {
+            if (c > '9' || c < '0') {
+                return false;
+            }
+            return true;
+        }
+
 
         static int binarySearch(const int &target, const std::vector<Statics> &main_list) {
             int l = 0, r = main_list.size() - 1;
@@ -193,25 +200,31 @@ class IO {
             return -1; // 找不到
         }
         static void readFile(const std::string& prefix, std::vector<Statics>& list) {
+            int count = 0;
             std::ifstream file("input" + prefix + ".txt");
             std::string header;
             std::getline(file, header);
-            std::string line;
-            while (std::getline(file, line)) {
-                std::istringstream linestream(line);
+            std::string num, name, type1, type2, total, hp, atk, def, sp_atk, sp_def, speed, generation, legendary;
+            while (std::getline(file, num, '\t')) {
+                std::cout << count++ << std::endl;
                 Statics data;
-                std::string num, name, type1, type2, total, hp, atk, def, sp_atk, sp_def, speed, generation, legendary;
-                linestream >> num >> name >> type1 >> type2;
-                try {
-                    int temp = std::stoi(type2);
-                    // type2 was actually the total
+                std::getline(file, name, '\t');
+                std::getline(file, type1, '\t');
+                std::getline(file, type2, '\t');
+                if (isNumber(type2[0])) {
                     total = type2;
                     type2 = "";
-                } catch (...) {
-                    linestream >> total;
+                } else {
+                    std::getline(file, total, '\t');
                 }
-
-                linestream >> hp >> atk >> def >> sp_atk >> sp_def >> speed >> generation >> legendary;
+                std::getline(file, hp, '\t');
+                std::getline(file, atk, '\t');
+                std::getline(file, def, '\t');
+                std::getline(file, sp_atk, '\t');
+                std::getline(file, sp_def, '\t');
+                std::getline(file, speed, '\t');
+                std::getline(file, generation, '\t');
+                std::getline(file, legendary, '\n');
                 data.num = std::stoi(num);
                 data.name = name;
                 data.type1 = type1;
@@ -267,21 +280,30 @@ class IO {
         }
 
         static void printTask3(std::vector<Statics>& main_list, int rec_hp, int height) {
-            int i = 1;
-            std::cout << "\t#\tName\tType 1\tTotal\tHP\tAttack\tDefense\tSp .Atk\tSp .Def\n";
+            int count = 1;
+            std::cout << "\t#"
+                    << "\t" << "Name"
+                    << "               \t" << "Type 1"
+                    << "    \t" << "Total"
+                    << "\t" << "HP"
+                    << "\t" << "Attack"
+                    << "\t" << "Defense"
+                    << "\t" << "Sp.Atk"
+                    << "\t" << "Sp.Def"
+                    << "\n";
             for (auto it = main_list.begin(); it != main_list.end();) {
                 if (it -> hp == rec_hp) {
-                    std::cout << "[" << std::setw(3) << std::right << i++ << "]";
-                    std::cout << "\t" << it -> num;
-                    std::cout << "\t" << it -> name;
-                    std::cout << "\t" << it -> type1;
-                    std::cout << "\t" << it -> total;
+                    std::cout << "[" << std::setw(3) << std::right << count << "]";
+                    std::cout << "\t" << std::setw(20) << std::left << it -> name;
+                    std::cout << "\t" << std::setw(10) << std::left << it -> type1;
+                    std::cout << "\t" << std::setw(6) << std::left << it -> total;
                     std::cout << "\t" << it -> hp;
                     std::cout << "\t" << it -> atk;
                     std::cout << "\t" << it -> def;
                     std::cout << "\t" << it -> sp_atk;
-                    std::cout << "\t" << it -> sp_def << "\n";
+                    std::cout << "\t" << std::setw(6) << std::left << it -> sp_def << "\n";
                     it = main_list.erase(it); //回傳跳到下一個位置
+                    count++;
                 } else {
                     it++;
                 }
