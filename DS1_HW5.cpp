@@ -115,19 +115,22 @@ class BinarySearchTree {
                 cur = cur -> right;
             }
             if (!parent) { //root
-                if (cur -> left)
+                if (cur -> left) {
                     root = cur -> left;
-                else
+                    max_hp = cur -> left -> hp;
+                } else {
                     root = nullptr;
+                    max_hp = 0;
+                }
             } else {
                 parent->right = cur->left;
+                if (parent -> right != nullptr) {
+                    max_hp = parent -> right -> hp;
+                } else {
+                    max_hp = parent -> hp;
+                }
             }
 
-            if (parent -> right != nullptr) {
-                max_hp = parent -> right -> hp;
-            } else {
-                max_hp = parent -> hp;
-            }
             int rec_hp = cur -> hp;
             delete cur;
             return rec_hp;
