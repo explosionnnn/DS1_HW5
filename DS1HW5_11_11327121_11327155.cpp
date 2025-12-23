@@ -159,19 +159,12 @@ class BinarySearchTree {
             }
         }
 
-        void inOrderHelper(Node* tree, std::vector<std::pair<int, std::vector<int>>>& result) {
-            if (tree) {
-                inOrderHelper(tree->left, result);
-                result.push_back({tree->hp, tree->number_list});
-                inOrderHelper(tree->right, result);
-            }
-        }
 
         void inOrder(Node* tree, std::vector<std::pair<int, std::vector<int>>> &result) {
             if (tree) {
-                inOrderHelper(tree->left, result);
+                inOrder(tree->left, result);
                 result.push_back({tree->hp, tree->number_list});
-                inOrderHelper(tree->right, result);
+                inOrder(tree->right, result);
             }
             return;
         }
